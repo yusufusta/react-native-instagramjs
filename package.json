@@ -1,8 +1,8 @@
 {
-    "name": "instagram.js",
+    "name": "react-native-instagramjs",
     "version": "1.0.0",
-    "description": "JavaScript library for Instagram's private web API.",
-    "author": "Ayush Chowdhury <https://ayushch.tech>",
+    "description": "React Native library for Instagram's private web API.",
+    "author": "Yusuf Usta <https://yusufusta.net>",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -14,10 +14,13 @@
     ],
     "dependencies": {
         "cross-fetch": "^3.1.4",
+        "md5": "^2.3.0",
+        "query-string": "^7.0.1",
         "randoma": "^1.3.0",
         "tough-cookie": "^4.0.0"
     },
     "devDependencies": {
+        "@types/md5": "^2.3.1",
         "@types/node": "^16.7.10",
         "@types/tough-cookie": "^4.0.1",
         "rimraf": "^3.0.2",
