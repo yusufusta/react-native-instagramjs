@@ -18,7 +18,7 @@ class Client {
     private cookies: any;
 
     public constructor() {
-        this.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36";
+        this.userAgent = getUserAgent();
     }
 
     public async login({ username, password }: { username: string; password: string }) {
@@ -119,7 +119,6 @@ class Client {
 
     public async getMe() {
         const userData = (await this.getSharedData("/accounts/edit/")).config.viewer;
-        this.userAgent = getUserAgent(userData.username);
         return userData;
     }
 
