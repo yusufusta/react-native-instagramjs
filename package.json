@@ -1,6 +1,6 @@
 {
     "name": "react-native-instagramjs",
-    "version": "1.0.0",
+    "version": "1.5.0",
     "description": "React Native library for Instagram's private web API.",
     "author": "Yusuf Usta <https://yusufusta.net>",
     "main": "dist/index.js",
@@ -29,10 +29,10 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/itsayushch/instagram.js.git"
+        "url": "git+https://github.com/yusufusta/react-native-instagramjs.git"
     },
     "bugs": {
-        "url": "https://github.com/itsayushch/instagram.js/issues"
+        "url": "https://github.com/yusufusta/react-native-instagramjs/issues"
     },
-    "homepage": "https://github.com/itsayushch/instagram.js#readme"
+    "homepage": "https://github.com/yusufusta/react-native-instagramjs#readme"
 }

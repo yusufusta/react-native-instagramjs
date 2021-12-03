@@ -6,8 +6,10 @@ import md5 from 'md5';
 
 class Client {
     private readonly baseUrl = 'https://www.instagram.com';
+    private readonly baseUrlApi = 'https://i.instagram.com';
+
     private sharedData: any;
-    private userAgent: string;
+    public userAgent: string;
     private csrftoken: undefined | string;
     private credentials!: {
         username: string;
@@ -16,7 +18,7 @@ class Client {
     private cookies: any;
 
     public constructor() {
-        this.userAgent = getUserAgent("random");
+        this.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36";
     }
 
     public async login({ username, password }: { username: string; password: string }) {
@@ -116,7 +118,9 @@ class Client {
     }
 
     public async getMe() {
-        return (await this.getSharedData("/accounts/edit/")).config.viewer;
+        const userData = (await this.getSharedData("/accounts/edit/")).config.viewer;
+        this.userAgent = getUserAgent(userData.username);
+        return userData;
     }
 
     public async followById({ id }: { id: number }) {
@@ -137,6 +141,45 @@ class Client {
         return data;
     }
 
+    async getFollowings({
+        userId,
+        nextMaxId = null
+    }: {
+        userId: number,
+        nextMaxId?: any
+    }) {
+        const res = await this.fetch(`/api/v1/friendships/${userId}/following/?count=12${nextMaxId != null ? `&max_id=${nextMaxId}` : ""}`, {
+            method: 'GET',
+            isApi: true,
+            headers: {
+                Referer: `${this.baseUrl}/`,
+                Origin: this.baseUrl,
+                "x-ig-app-id": 936619743392459,
+            }
+        });
+        const data: any = await res.json();
+        return data;
+    }
+
+    async getFollowers({
+        userId,
+        nextMaxId = null
+    }: {
+        userId: number,
+        nextMaxId?: any
+    }) {
+        const res = await this.fetch(`/api/v1/friendships/${userId}/followers/?count=12${nextMaxId != null ? `&max_id=${nextMaxId}` : ""}`, {
+            method: 'GET',
+            isApi: true,
+            headers: {
+                Referer: this.baseUrl,
+                "x-ig-app-id": 936619743392459,
+            }
+        });
+        const data: any = await res.json();
+        return data;
+    }
+
     private async getSharedData(url = '/') {
         return this.fetch(url)
             .then((res) => res.text())
@@ -152,7 +195,7 @@ class Client {
 
     private async fetch(
         path: string,
-        { method, headers, body }: { method: string; headers?: any; body?: any } = {
+        { method, headers, body, isApi = false }: { method: string; headers?: any; body?: any, isApi?: boolean } = {
             method: 'GET',
             headers: {},
             body: {}
@@ -167,13 +210,13 @@ class Client {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': this.csrftoken || '',
                 'Cookie': this.cookies,
-                Referer: this.baseUrl,
+                
                 ...headers
             }
         };
 
         if (method !== 'GET') Object.assign(options, { body: stringify(body) });
-        const res = await fetch(`${this.baseUrl}${path}`, options);
+        const res = await fetch(`${isApi ? this.baseUrlApi : this.baseUrl}${path}`, options);
 
         return res;
     }
