@@ -1,6 +1,6 @@
 {
     "name": "react-native-instagramjs",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "description": "React Native library for Instagram's private web API.",
     "author": "Yusuf Usta <https://yusufusta.net>",
     "main": "dist/index.js",

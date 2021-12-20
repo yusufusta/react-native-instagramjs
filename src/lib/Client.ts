@@ -86,7 +86,11 @@ class Client {
     public async likeById({ id }: { id: number }) {
         const res = await this.fetch(`/web/likes/${id}/like/`, {
             method: 'POST',
-            body: ""
+            body: "",
+                        headers: {
+                'content-type': 'application/x-www-form-urlencoded', // RN need this
+            }
+
         });
         const data: any = await res.json();
         return data;
@@ -95,7 +99,10 @@ class Client {
     public async unlikeById({ id }: { id: number }) {
         const res = await this.fetch(`/web/likes/${id}/unlike/`, {
             method: 'POST',
-            body: ""
+            body: "",
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded', // RN need this
+            }
         });
         const data: any = await res.json();
         return data;
@@ -125,7 +132,10 @@ class Client {
     public async followById({ id }: { id: number }) {
         const res = await this.fetch(`/web/friendships/${id}/follow/`, {
             method: 'POST',
-            body: ""
+            body: "",
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded', // RN need this
+            }
         });
         const data: any = await res.json();
         return data;
@@ -134,7 +144,10 @@ class Client {
     public async unfollowById({ id }: { id: number }) {
         const res = await this.fetch(`/web/friendships/${id}/unfollow/`, {
             method: 'POST',
-            body: ""
+            body: "",
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded', // RN need this
+            }
         });
         const data: any = await res.json();
         return data;
@@ -179,6 +192,80 @@ class Client {
         return data;
     }
 
+    async getReelsTray() {
+        const res = await this.fetch(`/api/v1/feed/reels_tray/`, {
+            method: 'GET',
+            isApi: true,
+            headers: {
+                Referer: this.baseUrl,
+                "x-ig-app-id": 936619743392459,
+            }
+        });
+        const data: any = await res.json();
+        return data;
+    }
+
+    async getUsersReels({ userIds }: { userIds: number[] }) {
+        var reelIds = "";
+        reelIds = userIds.map((u) => "reel_ids=" + u).join("&");
+
+        const res = await this.fetch(`/api/v1/feed/reels_media/?${reelIds}`, {
+            method: 'GET',
+            isApi: true,
+            headers: {
+                Referer: this.baseUrl,
+                "x-ig-app-id": 936619743392459,
+            }
+        });
+        const data: any = await res.json();
+        return data;
+    }
+
+    async search({ query }: { query: string }) {
+        const res = await this.fetch(`/web/search/topsearch/?context=blended&query=${query}&rank_token=0.8089417322331964&include_reel=true`, {
+            method: 'GET',
+        });
+        const data: any = await res.json();
+        return data;
+    }
+
+    async getMediaLikes({
+        short_code,
+        first = 24,
+        nextMaxId = null
+    }: {
+        short_code: string,
+        first?: number,
+        nextMaxId?: any
+    }) {
+        const variables = {
+            "shortcode": short_code,
+            "include_reel": true,
+            "first": first,
+            "after": nextMaxId};
+
+        const res = await this.fetch(`/graphql/query/?query_hash=d5d763b1e2acf209d62d22d184488e57&variables=${JSON.stringify(variables)}`, {
+            method: 'GET',
+        });
+        const data: any = await res.json();
+        return data;
+    }
+
+    async getMediaComments({
+        short_code,
+    }: {
+        short_code: string,
+    }) {
+        const variables = {
+            "shortcode": short_code,
+            "child_comment_count":3,"fetch_comment_count":40,"parent_comment_count":24,"has_threaded_comments":true};
+        const res = await this.fetch(`/graphql/query/?query_hash=7d4d42b121a214d23bd43206e5142c8c&variables=${JSON.stringify(variables)}`, {
+            method: 'GET',
+        });
+        const data: any = await res.json();
+        return data;
+    }
+
     private async getSharedData(url = '/') {
         return this.fetch(url)
             .then((res) => res.text())
@@ -209,7 +296,6 @@ class Client {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': this.csrftoken || '',
                 'Cookie': this.cookies,
-                
                 ...headers
             }
         };
