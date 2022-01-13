@@ -8,7 +8,7 @@ class Client {
     private readonly baseUrl = 'https://www.instagram.com';
     private readonly baseUrlApi = 'https://i.instagram.com';
 
-    private sharedData: any;
+    public sharedData: any;
     public userAgent: string;
     private csrftoken: undefined | string;
     private credentials!: {
@@ -16,9 +16,11 @@ class Client {
         password: string;
     };
     private cookies: any;
+    public rolloutHash: string = "1";
 
-    public constructor() {
+    public constructor(rolloutHash="1") {
         this.userAgent = getUserAgent();
+        this.rolloutHash = rolloutHash;
     }
 
     public async login({ username, password }: { username: string; password: string }) {
@@ -87,10 +89,10 @@ class Client {
         const res = await this.fetch(`/web/likes/${id}/like/`, {
             method: 'POST',
             body: "",
-                        headers: {
+
+            headers: {
                 'content-type': 'application/x-www-form-urlencoded', // RN need this
             }
-
         });
         const data: any = await res.json();
         return data;
@@ -266,6 +268,35 @@ class Client {
         return data;
     }
 
+    async convertCDToArray(cookieDict: any): Promise<any[]> {
+        var CookiesArray: any[] = [];
+        Object.keys(cookieDict).forEach(key => {
+          var k = cookieDict[key];
+          k['key'] = k['name'];
+          CookiesArray.push(k);
+        });
+        return CookiesArray;
+    }
+
+    async sendStorySeen({
+            reelMediaId,
+            reelMediaOwnerId,
+            reelId,
+            reelMediaTakenAt,
+            viewSeenAt    
+        }: { reelMediaId: number,
+            reelMediaOwnerId: number,
+            reelId: number,
+            reelMediaTakenAt: number,
+            viewSeenAt: number }) {
+        const res = await this.fetch(`/stories/reel/seen`, {
+            method: 'POST',
+            body: `reel_media_id=${reelMediaId}&reel_media_owner_id=${reelMediaOwnerId}&reel_id=${reelId}&reel_media_taken_at=${reelMediaTakenAt}&view_time_in_story=${viewSeenAt}`,
+        });
+        const data: any = await res.json();
+        return data;
+    };
+
     private async getSharedData(url = '/') {
         return this.fetch(url)
             .then((res) => res.text())
@@ -289,10 +320,11 @@ class Client {
     ) {
         const options = {
             method,
+            follow: 0,
             headers: {
                 'User-Agent': this.userAgent,
                 'Accept-Language': 'en-US',
-                'X-Instagram-AJAX': '1',
+                'X-Instagram-AJAX': this.rolloutHash,
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': this.csrftoken || '',
                 'Cookie': this.cookies,
